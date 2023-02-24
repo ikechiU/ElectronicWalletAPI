@@ -1,5 +1,6 @@
 package com.example.sikabethwalletapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.Date;
  * @project SikabethWalletAPI
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @MappedSuperclass
 @Getter
 @Setter
@@ -23,7 +25,7 @@ public abstract class Base implements Serializable {
     private static final long serialVersionUID  = -3290965513559831382L;
 
     @Id
-    private Long id;
+    private String id;
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @Temporal(TemporalType.TIMESTAMP)

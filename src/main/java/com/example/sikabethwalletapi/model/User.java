@@ -1,10 +1,8 @@
 package com.example.sikabethwalletapi.model;
 
 import com.example.sikabethwalletapi.enums.Status;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,6 +17,7 @@ import java.util.Date;
  * @project SikabethWalletAPI
  */
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Document("users")
 @Getter
 @Setter
@@ -30,7 +29,10 @@ public class User extends Base {
     private String uuid;
 
     @Column(nullable = false, length = 50)
-    private String name;
+    private String firstName;
+
+    @Column(nullable = false, length = 50)
+    private String lastName;
 
     @Column(nullable = false, length = 50)
     private String email;
