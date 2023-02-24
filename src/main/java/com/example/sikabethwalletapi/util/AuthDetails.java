@@ -19,11 +19,10 @@ public class AuthDetails {
     private String AUTH_USER;
     @Value(value = "${active.auth.user}")
     private String ACTIVE_AUTH_USER;
-
     private final UserRepository userRepository;
     private final LocalStorage localStorage;
 
-    public User getAuthorizedUser(Principal principal) {
+    private User getAuthorizedUser(Principal principal) {
         if (principal != null) {
             final String email = principal.getName();
             return userRepository.findByEmail(email)

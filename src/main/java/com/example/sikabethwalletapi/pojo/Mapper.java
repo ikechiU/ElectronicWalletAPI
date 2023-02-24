@@ -1,7 +1,8 @@
-package com.example.sikabethwalletapi.pojo.dto;
+package com.example.sikabethwalletapi.pojo;
 
 import com.example.sikabethwalletapi.enums.Status;
 import com.example.sikabethwalletapi.model.User;
+import com.example.sikabethwalletapi.pojo.paystack.request.CreateCustomerRequest;
 import com.example.sikabethwalletapi.pojo.request.RegisterRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -31,6 +32,15 @@ public class Mapper implements Serializable {
                 .state(request.getState())
                 .homeAddress(request.getHomeAddress())
                 .phoneNumber(request.getPhoneNumber())
+                .build();
+    }
+
+    public static CreateCustomerRequest mapFromUser(User user) {
+        return CreateCustomerRequest.builder()
+                .email(user.getEmail())
+                .first_name(user.getFirstName())
+                .last_name(user.getLastName())
+                .phone(user.getPhoneNumber())
                 .build();
     }
 

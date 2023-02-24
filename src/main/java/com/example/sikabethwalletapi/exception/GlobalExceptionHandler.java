@@ -135,7 +135,21 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(ValidationException ex) {
         log.error(ex.getMessage());
-        return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN);
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = PaymentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlePaymentException(PaymentException ex) {
+        log.error(ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = WalletException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleWalletException(WalletException ex) {
+        log.error(ex.getMessage());
+        return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = Exception.class)

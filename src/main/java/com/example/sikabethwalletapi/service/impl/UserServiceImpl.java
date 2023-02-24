@@ -1,12 +1,14 @@
 package com.example.sikabethwalletapi.service.impl;
 
 import com.example.sikabethwalletapi.enums.Status;
+import com.example.sikabethwalletapi.enums.VerificationStatus;
 import com.example.sikabethwalletapi.exception.AuthenticationException;
 import com.example.sikabethwalletapi.exception.UserNotFoundException;
 import com.example.sikabethwalletapi.exception.ValidationException;
 import com.example.sikabethwalletapi.model.User;
 import com.example.sikabethwalletapi.model.Wallet;
-import com.example.sikabethwalletapi.pojo.dto.Mapper;
+import com.example.sikabethwalletapi.pojo.Mapper;
+import com.example.sikabethwalletapi.pojo.paystack.response.CreateCustomerResponse;
 import com.example.sikabethwalletapi.pojo.request.ActivationRequest;
 import com.example.sikabethwalletapi.pojo.request.LoginRequest;
 import com.example.sikabethwalletapi.pojo.request.PasswordResetRequest;
@@ -17,12 +19,14 @@ import com.example.sikabethwalletapi.repository.UserRepository;
 import com.example.sikabethwalletapi.repository.WalletRepository;
 import com.example.sikabethwalletapi.security.JwtUtils;
 import com.example.sikabethwalletapi.security.UserPrincipal;
+import com.example.sikabethwalletapi.service.PaymentService;
 import com.example.sikabethwalletapi.service.UserService;
 import com.example.sikabethwalletapi.util.AmazonSES;
 import com.example.sikabethwalletapi.util.AppUtil;
 import com.example.sikabethwalletapi.util.AuthDetails;
 import com.example.sikabethwalletapi.util.LocalStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,6 +51,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Value(value = "${user.email.activate}")
@@ -73,6 +78,8 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final AmazonSES amazonSES;
 
+    private final PaymentService paymentService;
+
     @Override
     public RegisterResponse createUser(RegisterRequest request) {
         if (!util.validEmail(request.getEmail()))
@@ -83,7 +90,6 @@ public class UserServiceImpl implements UserService {
             throw new ValidationException("User already exist");
 
         User newUser = Mapper.mapUser(request);
-        newUser.setWalletId(generateWallet().getWalletId());
 
         String token = util.generateSerialNumber("A");
         localStorage.save(USER_EMAIL_ACTIVATE + request.getEmail(), token, 432000);
@@ -125,6 +131,9 @@ public class UserServiceImpl implements UserService {
         validateEmail(request.getEmail());
         User user = getUser(request.getEmail());
 
+        if (user.getStatus() == Status.ACTIVE)
+            return "Account already activated";
+
         String systemToken = localStorage.getValueByKey(USER_EMAIL_ACTIVATE + request.getEmail());
         if (systemToken == null)
             throw new ValidationException("Token expired");
@@ -132,6 +141,16 @@ public class UserServiceImpl implements UserService {
         if (!systemToken.equalsIgnoreCase(request.getToken()))
             throw new ValidationException("Invalid token");
 
+        CreateCustomerResponse response = paymentService.createCustomer(Mapper.mapFromUser(user));
+        if (!response.isStatus()) throw new RuntimeException("Something went wrong try again");
+
+        String customer_code = response.getData().getCustomer_code();
+        log.info(customer_code);
+        Wallet wallet = generateWallet();
+        wallet.setCustomer_code(customer_code);
+        walletRepository.save(wallet);
+
+        user.setWalletId(wallet.getWalletId());
         user.setStatus(Status.ACTIVE);
         user.setUpdatedDate(new Date());
         userRepository.save(user);
@@ -144,7 +163,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public String resendActivationToken(String email) {
         validateEmail(email);
-        getUser(email);
+        User user = getUser(email);
+        if (user.getStatus() == Status.ACTIVE)
+            return "Account already activated";
+
         String token = util.generateSerialNumber("A");
         localStorage.save(USER_EMAIL_ACTIVATE + email, token, 432000);
 
@@ -206,13 +228,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private Wallet generateWallet() {
-        Wallet wallet = Wallet.builder()
+        return Wallet.builder()
                 .uuid(UUID.randomUUID().toString())
                 .walletId(UUID.randomUUID().toString())
                 .pin(passwordEncoder.encode("0000"))
                 .balance(BigDecimal.ZERO)
+                .isVerified(false)
+                .bvn(null)
+                .verificationStatus(VerificationStatus.UNCONFIRMED)
+                .isBlacklisted(false)
                 .build();
-
-        return walletRepository.save(wallet);
     }
 }

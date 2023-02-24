@@ -1,5 +1,6 @@
 package com.example.sikabethwalletapi.model;
 
+import com.example.sikabethwalletapi.enums.VerificationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,6 +37,14 @@ public class Wallet extends Base {
     @Column(nullable = false, length = 4)
     private String pin;
 
-    public Wallet() {super();}
+    private String bvn;
+    private boolean isVerified;
+    private VerificationStatus verificationStatus;
+    private String customer_code;
+    private boolean isBlacklisted;
+
+    public Wallet() {
+        super();
+    }
 
 }
