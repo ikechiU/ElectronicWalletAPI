@@ -58,9 +58,6 @@ public class AmazonSES {
     public void verifyEmail(String token, String email) {
         awsMasked();
 
-        AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(Regions.US_EAST_2)
-                .build();
-
         String htmlBodyWithToken = HTMLBODY.replace("$tokenValue", token);
         String textBodyWithToken = TEXTBODY.replace("$tokenValue", token);
 
@@ -72,7 +69,7 @@ public class AmazonSES {
                         .withSubject(new Content().withCharset("UTF-8").withData(SUBJECT)))
                 .withSource(FROM);
 
-        client.sendEmail(request);
+        client().sendEmail(request);
 
         System.out.println("Email sent!");
 
@@ -87,10 +84,6 @@ public class AmazonSES {
     public boolean sendPasswordResetRequest(String firstName, String email, String token) {
         awsMasked();
         boolean returnValue = false;
-
-        AmazonSimpleEmailService client =
-                AmazonSimpleEmailServiceClientBuilder.standard()
-                        .withRegion(Regions.US_EAST_2).build();
 
         String htmlBodyWithToken = PASSWORD_RESET_HTMLBODY.replace("$tokenValue", token);
         htmlBodyWithToken = htmlBodyWithToken.replace("$firstName", firstName);
@@ -112,13 +105,43 @@ public class AmazonSES {
                                 .withCharset("UTF-8").withData(PASSWORD_RESET_SUBJECT)))
                 .withSource(FROM);
 
-        SendEmailResult result = client.sendEmail(request);
+        SendEmailResult result = client().sendEmail(request);
 
         if(result != null && (result.getMessageId()!=null && !result.getMessageId().isEmpty())) {
             returnValue = true;
         }
 
         return returnValue;
+    }
+
+    public boolean sendTransaction(String message, String email) {
+        awsMasked();
+        boolean returnValue = false;
+
+        SendEmailRequest request = new SendEmailRequest()
+                .withDestination(
+                        new Destination().withToAddresses( email ) )
+                .withMessage(new Message()
+                        .withBody(new Body()
+                                .withHtml(new Content()
+                                        .withCharset("UTF-8").withData(message))
+                                .withText(new Content()
+                                        .withCharset("UTF-8").withData(message)))
+                        .withSubject(new Content()
+                                .withCharset("UTF-8").withData("Transaction Update")))
+                .withSource(FROM);
+
+        SendEmailResult result = client().sendEmail(request);
+
+        if(result != null && (result.getMessageId()!=null && !result.getMessageId().isEmpty())) {
+            returnValue = true;
+        }
+
+        return returnValue;
+    }
+
+    private AmazonSimpleEmailService client() {
+        return AmazonSimpleEmailServiceClientBuilder.standard().withRegion(Regions.US_EAST_2).build();
     }
 
 }

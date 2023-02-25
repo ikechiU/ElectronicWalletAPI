@@ -1,6 +1,7 @@
 package com.example.sikabethwalletapi.model;
 
-import com.example.sikabethwalletapi.enums.VerificationStatus;
+import com.example.sikabethwalletapi.enums.TransactionSource;
+import com.example.sikabethwalletapi.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,43 +11,42 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Document("wallets")
+@Document("transactions")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
-public class Wallet extends Base {
+public class Transaction extends Base {
 
     @Indexed(unique = true)
     private String uuid;
 
     private String userUuid;
-    private String email;
-
-    @Indexed(unique = true)
-    private String walletId;
 
     @Column(nullable = false, length = 50)
+    private String reason;
+
+    @Column(nullable = false, length = 50)
+    private String from;
+
+    @Column(nullable = false, length = 50)
+    private String to;
+
+    private BigDecimal amount;
+
     private BigDecimal balance;
 
-    @Min(value = 4)
-    @Max(value = 4)
-    @Column(nullable = false, length = 4)
-    private String pin;
+    @Column(nullable = false, length = 50)
+    private String transactionReference;
 
-    private String bvn;
-    private boolean isVerified;
-    private VerificationStatus verificationStatus;
-    private String customer_code;
-    private boolean isBlacklisted;
+    private TransactionType transactionType;
 
-    public Wallet() {
+    private TransactionSource transactionSource;
+
+    public Transaction() {
         super();
     }
 

@@ -145,6 +145,8 @@ public class UserServiceImpl implements UserService {
         log.info(customer_code);
         Wallet wallet = generateWallet();
         wallet.setCustomer_code(customer_code);
+        wallet.setEmail(user.getEmail());
+        wallet.setUserUuid(user.getUuid());
         walletRepository.save(wallet);
 
         user.setWalletId(wallet.getWalletId());

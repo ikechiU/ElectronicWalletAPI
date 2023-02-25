@@ -2,10 +2,14 @@ package com.example.sikabethwalletapi.controller.wallet;
 
 
 import com.example.sikabethwalletapi.pojo.ApiResponse;
+import com.example.sikabethwalletapi.pojo.paystack.request.SetUpTransactionRequest;
+import com.example.sikabethwalletapi.pojo.wallet.request.InitiateTransferFromSikabethToWalletRequest;
 import com.example.sikabethwalletapi.pojo.wallet.request.PinResetRequest;
 import com.example.sikabethwalletapi.pojo.wallet.request.WalletValidationRequest;
 import com.example.sikabethwalletapi.service.WalletService;
 import com.example.sikabethwalletapi.util.ResponseProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,9 +46,10 @@ public class WalletController {
     @PostMapping("/transfer-money")
     public ResponseEntity<ApiResponse<Object>> transferMoney(Principal principal,
                                                              @RequestParam String recipientWalletId,
-                                                             @RequestParam BigDecimal amount,
+                                                             @RequestParam String amount,
+                                                             @RequestParam String reason,
                                                              @RequestParam String pin) {
-        return responseProvider.success(walletService.transferMoney(principal, recipientWalletId, amount, pin));
+        return responseProvider.success(walletService.transferMoneyWalletToWallet(principal, recipientWalletId, amount, reason, pin));
     }
 
     @PostMapping("/pay-service")
@@ -63,6 +68,25 @@ public class WalletController {
     @PostMapping("/reset-pin")
     public ResponseEntity<ApiResponse<Object>> resetPin(Principal principal, @RequestBody PinResetRequest request) {
         return responseProvider.success(walletService.resetPin(principal, request));
+    }
+
+    @Operation(summary = "THIS ENDPOINT INITIATES A TRANSFER VIA SIKABETH TO YOUR WALLET. ")
+    @PostMapping("/initialize-payment-to-wallet-via-sikabeth")
+    public ResponseEntity<ApiResponse<Object>> setUpTransaction(Principal principal,
+                                                                InitiateTransferFromSikabethToWalletRequest request
+    ) {
+        return responseProvider.success(walletService.initializeTransaction(principal, request));
+    }
+
+    @Operation(summary = "VERIFY TRANSFER TO WALLET VIA SIKABETH. YOU NEED TO SUBMIT reference AND transfer_code.")
+    @GetMapping("/verify-reference-payment-to-wallet-via-sikabeth")
+    public ResponseEntity<ApiResponse<Object>> verifyPayment(Principal principal,
+                                                             @Parameter(description = "This is the reference number generated when the transaction was initiated.")
+                                                             @RequestParam String reference,
+                                                             @Parameter(description = "This is the transfer_code number generated when the transaction was initiated.")
+                                                             @RequestParam String transfer_code
+    ) {
+        return responseProvider.success(walletService.verifyTransaction(principal, reference, transfer_code));
     }
 
 

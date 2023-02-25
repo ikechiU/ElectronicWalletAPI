@@ -54,7 +54,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public SetUpTransactionResponse initializeTransaction(Principal principal, SetUpTransactionRequest request) {
         checksBeforeTransaction(principal);
+        return initializeTransaction(request);
+    }
 
+    @Override
+    public SetUpTransactionResponse initializeTransaction(SetUpTransactionRequest request) {
         String url = "https://api.paystack.co/transaction/initialize";
         return restTemplate.exchange(
                 url,
@@ -67,7 +71,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public VerifyPaymentResponse verifyTransaction(Principal principal, String reference) {
         checksBeforeTransaction(principal);
+        return verifyTransaction(reference);
+        //SEND A MAIL TO USER THAT TRANSFER WAS SUCCESSFUL
+    }
 
+    @Override
+    public VerifyPaymentResponse verifyTransaction(String reference) {
         String url = "https://api.paystack.co/transaction/verify/" + reference;
         return restTemplate.exchange(
                 url,
@@ -75,8 +84,6 @@ public class PaymentServiceImpl implements PaymentService {
                 payStackHttpEntity.getEntity(),
                 VerifyPaymentResponse.class
         ).getBody();
-
-        //SEND A MAIL TO USER THAT TRANSFER WAS SUCCESSFUL
     }
 
     @Override

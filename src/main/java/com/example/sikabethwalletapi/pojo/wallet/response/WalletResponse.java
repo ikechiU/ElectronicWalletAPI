@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -24,17 +23,20 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class WalletResponse {
     private String uuid;
+    private String userUuid;
     private String walletId;
     private BigDecimal balance;
     private String bvn;
     private boolean isVerified;
     private String customer_code;
     private boolean isBlacklisted;
+    private String transactionReference;
     private VerificationStatus verificationStatus;
 
     public static WalletResponse mapFromWallet(Wallet wallet) {
         return WalletResponse.builder()
                 .uuid(wallet.getUuid())
+                .userUuid(wallet.getUserUuid())
                 .walletId(wallet.getWalletId())
                 .balance(wallet.getBalance())
                 .bvn(wallet.getBvn())

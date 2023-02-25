@@ -17,7 +17,9 @@ import java.security.Principal;
 
 public interface PaymentService {
     SetUpTransactionResponse initializeTransaction(Principal principal, SetUpTransactionRequest request);
+    SetUpTransactionResponse initializeTransaction(SetUpTransactionRequest request);
     VerifyPaymentResponse verifyTransaction(Principal principal, String reference);
+    VerifyPaymentResponse verifyTransaction(String reference);
     TransactionsResponse fetchTransactions(Principal principal);
     TransactionResponse fetchTransaction(Principal principal, long id);
     BankResponse fetchBanks(Principal principal, String currency, String type);

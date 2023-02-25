@@ -28,6 +28,7 @@ public class WalletChecker {
     }
 
     private void getWalletStatus(Wallet wallet) {
+
         if (wallet.getVerificationStatus().equals(VerificationStatus.PENDING))
             throw new WalletException("Kindly wait as your verification is in progress");
 
