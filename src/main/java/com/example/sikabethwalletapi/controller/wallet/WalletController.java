@@ -2,6 +2,7 @@ package com.example.sikabethwalletapi.controller.wallet;
 
 
 import com.example.sikabethwalletapi.pojo.ApiResponse;
+import com.example.sikabethwalletapi.pojo.wallet.request.PinResetRequest;
 import com.example.sikabethwalletapi.pojo.wallet.request.WalletValidationRequest;
 import com.example.sikabethwalletapi.service.WalletService;
 import com.example.sikabethwalletapi.util.ResponseProvider;
@@ -57,6 +58,11 @@ public class WalletController {
     @PostMapping("/validate")
     public ResponseEntity<ApiResponse<Object>> validateWallet(Principal principal, @RequestBody WalletValidationRequest request) {
         return responseProvider.success(walletService.validateWallet(principal, request));
+    }
+
+    @PostMapping("/reset-pin")
+    public ResponseEntity<ApiResponse<Object>> resetPin(Principal principal, @RequestBody PinResetRequest request) {
+        return responseProvider.success(walletService.resetPin(principal, request));
     }
 
 

@@ -39,9 +39,20 @@ public class BeansConfiguration {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearer-jwt",
-                        new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")
+                        new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer").bearerFormat("JWT")
                                 .in(SecurityScheme.In.HEADER).name("Authorization")))
-                .info(new Info().title("SikabethWalletAPI").version("snapshot").description("A Wallet API Integrated With PayStack"))
+                .info(new Info().title("SikabethWalletAPI").version("snapshot")
+                        .description("""
+                                <div><h1>A Wallet API Integrated With PayStack. </h1></div>
+                          
+                                <h3><b><u>Quick guide</u></b></h3>
+                                <div>1. On successful registration. Kindly check your email to get an activation code needed to activate account.</div>
+                                <div>2. Next, login with your email and password. To get a JWT token.</div>
+                                <div>3. Then, copy JWT token returned and paste at the top right corner button called Authorize.</div>
+                                <div>4. You can now proceed with any endpoint call that is protected.</div>
+                                
+                                """))
                 .addSecurityItem(
                         new SecurityRequirement().addList("bearer-jwt", Arrays.asList("read", "write")));
     }

@@ -5,6 +5,7 @@ import com.example.sikabethwalletapi.exception.WalletException;
 import com.example.sikabethwalletapi.model.User;
 import com.example.sikabethwalletapi.model.Wallet;
 import com.example.sikabethwalletapi.pojo.paystack.response.CustomerValidationResponse;
+import com.example.sikabethwalletapi.pojo.wallet.request.PinResetRequest;
 import com.example.sikabethwalletapi.pojo.wallet.request.WalletValidationRequest;
 import com.example.sikabethwalletapi.pojo.wallet.response.WalletResponse;
 import com.example.sikabethwalletapi.repository.WalletRepository;
@@ -36,6 +37,7 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final PasswordEncoder encoder;
     private final PaymentService paymentService;
+    private final WalletChecker walletChecker;
 
 
     @Override
@@ -54,7 +56,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletResponse transferMoney(Principal principal, String recipientWalletId, BigDecimal amount, String pin) {
-        checksBeforeTransaction(principal);
+        Wallet wallet = checksBeforeTransaction(principal);
 
 
         return null;
@@ -62,7 +64,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public WalletResponse payService(Principal principal, String serviceName, BigDecimal amount, String pin) {
-        checksBeforeTransaction(principal);
+        Wallet wallet = checksBeforeTransaction(principal);
 
 
         return null;
@@ -73,7 +75,7 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = getUserWallet(principal);
 
         //N/B: THE VALIDATION OUGHT TO BE WITH CURRENT USER'S INFORMATION OR RATHER COLLECT ONLY BVN, NIN
-        //AND BANK THEN DO A VALIDATION COMPARE IF NAME, PHONE AND OTHER DATA THEY PRESENTED MATCHES
+        //AND BANK DETAILS THEN DO A VALIDATION COMPARE IF NAME, PHONE AND OTHER DATA THEY PRESENTED MATCHES
         //I.E WHAT HAS BEEN STORED IN DATABASE. ANOTHER EXTRA LAYER WOULD BE TO COLLECT FINGERPRINTS
         //AND PICTURE OF USE AND COMPARE WITH BVN AND NIN VALIDATION
         CustomerValidationResponse response = paymentService.validateCustomer(request);
@@ -84,29 +86,31 @@ public class WalletServiceImpl implements WalletService {
         return response.getMessage();
     }
 
+    @Override
+    public String resetPin(Principal principal, PinResetRequest request) {
+        Wallet wallet = getUserWallet(principal);
+        boolean oldPinMatch = encoder.matches( request.getOldPin(), wallet.getPin());
+        if (!oldPinMatch) throw new WalletException("Old pin does not match existing pin in records");
+
+        boolean newPinMatch = request.getNewPin().equals(request.getConfirmNewPin());
+        if (!newPinMatch) throw new WalletException("New pin and confirm new pin does not match");
+
+        wallet.setPin(encoder.encode(request.getNewPin()));
+        walletRepository.save(wallet);
+
+        return "Pin change successful";
+    }
+
+    public Wallet checksBeforeTransaction(Principal principal) {
+        Wallet wallet = getUserWallet(principal);
+        walletChecker.checksBeforeTransaction(wallet, encoder);
+        return wallet;
+    }
+
     private Wallet getUserWallet(Principal principal) {
         User user = authDetails.validateActiveUser(principal);
         return walletRepository.findByWalletId(user.getWalletId())
                 .orElseThrow(() -> new WalletException("Wallet does not exist."));
     }
 
-    private void getWalletStatus(Wallet wallet) {
-        if (wallet.getVerificationStatus().equals(VerificationStatus.PENDING))
-            throw new WalletException("Kindly wait as your verification is in progress");
-
-        if (!wallet.isVerified())
-            throw new WalletException("Kindly validate your wallet");
-    }
-
-    private void checkDefaultPin(Wallet wallet) {
-        boolean isDefault = encoder.matches(wallet.getPin(), "0000");
-        if (isDefault)
-            throw new WalletException("Please, change your pin");
-    }
-
-    private void checksBeforeTransaction(Principal principal) {
-        Wallet wallet = getUserWallet(principal);
-        getWalletStatus(wallet);
-        checkDefaultPin(wallet);
-    }
 }

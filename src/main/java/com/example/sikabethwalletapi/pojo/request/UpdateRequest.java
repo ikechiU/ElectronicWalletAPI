@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 /**
  * @author Ikechi Ucheagwu
  * @created 23/02/2023 - 22:08
@@ -17,9 +15,11 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
-    @NotBlank(message = "email must be balance")
-    private String email;
-    @NotBlank(message = "password must be balance")
-    private String password;
+public class UpdateRequest {
+    private String firstName;
+    private String lastName;
+    private String country;
+    private String state;
+    private String homeAddress;
+    private String phoneNumber;
 }

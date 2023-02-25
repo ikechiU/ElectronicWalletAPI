@@ -1,9 +1,6 @@
 package com.example.sikabethwalletapi.service;
 
-import com.example.sikabethwalletapi.pojo.request.ActivationRequest;
-import com.example.sikabethwalletapi.pojo.request.LoginRequest;
-import com.example.sikabethwalletapi.pojo.request.PasswordResetRequest;
-import com.example.sikabethwalletapi.pojo.request.RegisterRequest;
+import com.example.sikabethwalletapi.pojo.request.*;
 import com.example.sikabethwalletapi.pojo.response.LoginResponse;
 import com.example.sikabethwalletapi.pojo.response.RegisterResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +18,10 @@ public interface UserService extends UserDetailsService {
     LoginResponse login(LoginRequest request);
     String activateUser(ActivationRequest request);
     String resendActivationToken(String email);
+    String delete(Principal principal);
     String forgotPassword(String email);
     String resetPassword(PasswordResetRequest request);
+    RegisterResponse updateUser(Principal principal, UpdateRequest request);
     String logout(Principal principal);
+    String updatePassword(Principal principal, String password);
 }

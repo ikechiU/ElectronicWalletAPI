@@ -6,25 +6,22 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author Ikechi Ucheagwu
- * @created 24/02/2023 - 16:24
+ * @created 25/02/2023 - 14:05
  * @project SikabethWalletAPI
  */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferRecipient {
-    private boolean active;
-    private String createdAt;
-    private String currency;
-    private String domain;
+public class VerifyTransfer {
     private long id;
     private long integration;
-    private String name;
+    private Recipient recipient;
+    private String description;
+    private String metadata;
     private String recipient_code;
-    private String reference;
-    private String type;
+    private boolean active;
+    private String email;
+    private String createdAt;
     private String updatedAt;
-    private boolean is_deleted;
-    private RecipientDetails details;
 }

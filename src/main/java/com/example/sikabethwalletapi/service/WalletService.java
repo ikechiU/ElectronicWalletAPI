@@ -1,5 +1,6 @@
 package com.example.sikabethwalletapi.service;
 
+import com.example.sikabethwalletapi.pojo.wallet.request.PinResetRequest;
 import com.example.sikabethwalletapi.pojo.wallet.request.WalletValidationRequest;
 import com.example.sikabethwalletapi.pojo.wallet.response.WalletResponse;
 
@@ -20,4 +21,5 @@ public interface WalletService {
     WalletResponse transferMoney(Principal principal, String recipientWalletId, BigDecimal amount, String pin);
     WalletResponse payService(Principal principal, String serviceName, BigDecimal amount, String pin);
     String validateWallet(Principal principal, WalletValidationRequest request);
+    String resetPin(Principal principal, PinResetRequest request);
 }

@@ -1,5 +1,6 @@
 package com.example.sikabethwalletapi.pojo.paystack.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +20,11 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class SetUpTransactionRequest {
     @NotBlank(message = "email is mandatory")
+    @Schema(example = "example@abc.com")
     private String email;
+    @Schema(example = "Amount should be in Kobo, Pesewas or Cents")
     @NotBlank(message = "amount should be specified in Kobo, pesewas or cents")
     private String amount;
-    private String callback_url;
-    private Object metadata;
+    @Schema(example = "Currency NGN")
     private String currency;
 }

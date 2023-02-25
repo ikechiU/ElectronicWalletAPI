@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TransferRecipientResponse {
-    private String status;
+    private boolean status;
     private String message;
     private TransferRecipient data;
 }

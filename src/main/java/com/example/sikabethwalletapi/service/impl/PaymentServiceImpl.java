@@ -1,24 +1,28 @@
 package com.example.sikabethwalletapi.service.impl;
 
 import com.example.sikabethwalletapi.exception.PaymentException;
+import com.example.sikabethwalletapi.exception.WalletException;
 import com.example.sikabethwalletapi.model.User;
-import com.example.sikabethwalletapi.pojo.paystack.request.AccountRequest;
+import com.example.sikabethwalletapi.model.Wallet;
 import com.example.sikabethwalletapi.pojo.paystack.Bank;
 import com.example.sikabethwalletapi.pojo.paystack.TransferRecipient;
+import com.example.sikabethwalletapi.pojo.paystack.request.AccountRequest;
 import com.example.sikabethwalletapi.pojo.paystack.request.CreateCustomerRequest;
 import com.example.sikabethwalletapi.pojo.paystack.request.SetUpTransactionRequest;
 import com.example.sikabethwalletapi.pojo.paystack.request.TransferRequest;
 import com.example.sikabethwalletapi.pojo.paystack.response.*;
 import com.example.sikabethwalletapi.pojo.wallet.request.WalletValidationRequest;
+import com.example.sikabethwalletapi.repository.WalletRepository;
 import com.example.sikabethwalletapi.service.PaymentService;
+import com.example.sikabethwalletapi.service.WalletService;
 import com.example.sikabethwalletapi.util.AppUtil;
 import com.example.sikabethwalletapi.util.AuthDetails;
 import com.example.sikabethwalletapi.util.LocalStorage;
 import com.example.sikabethwalletapi.util.PayStackHttpEntity;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,10 +47,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final AppUtil util;
     private final AuthDetails authDetails;
     private final LocalStorage localStorage;
+    private final WalletRepository walletRepository;
+    private final WalletChecker walletChecker;
+    private final PasswordEncoder encoder;
 
     @Override
     public SetUpTransactionResponse initializeTransaction(Principal principal, SetUpTransactionRequest request) {
-        authDetails.validateActiveUser(principal);
+        checksBeforeTransaction(principal);
 
         String url = "https://api.paystack.co/transaction/initialize";
         return restTemplate.exchange(
@@ -59,7 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public VerifyPaymentResponse verifyTransaction(Principal principal, String reference) {
-        authDetails.validateActiveUser(principal);
+        checksBeforeTransaction(principal);
 
         String url = "https://api.paystack.co/transaction/verify/" + reference;
         return restTemplate.exchange(
@@ -68,11 +75,13 @@ public class PaymentServiceImpl implements PaymentService {
                 payStackHttpEntity.getEntity(),
                 VerifyPaymentResponse.class
         ).getBody();
+
+        //SEND A MAIL TO USER THAT TRANSFER WAS SUCCESSFUL
     }
 
     @Override
     public TransactionsResponse fetchTransactions(Principal principal) {
-        authDetails.validateActiveUser(principal);
+        checksBeforeTransaction(principal);
 
         String url = "https://api.paystack.co/transaction";
         return restTemplate.exchange(
@@ -98,10 +107,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public BankResponse fetchBanks(Principal principal, String currency, String type) {
-        authDetails.validateActiveUser(principal);
+        checksBeforeTransaction(principal);
 
         String url = "https://api.paystack.co/bank?currency=" + currency + "&type=" + type;
-        BankResponse bankResponse =  restTemplate.exchange(
+        BankResponse bankResponse = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 payStackHttpEntity.getEntity(),
@@ -115,7 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public VerifyAccountResponse verifyAccount(Principal principal, String accountNumber, String bankCode) {
-        authDetails.validateActiveUser(principal);
+        checksBeforeTransaction(principal);
 
         String url = "https://api.paystack.co/bank/resolve?account_number=" + accountNumber + "&bank_code=" + bankCode;
         return restTemplate.exchange(
@@ -127,43 +136,63 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public TransferRecipient setUpTransferRecipient(Principal principal, AccountRequest request) {
-        User user = authDetails.validateActiveUser(principal);
+    public TransferRecipientResponse setUpTransferRecipient(Principal principal, AccountRequest request) {
+        User user = checksBeforeTransaction(principal);
 
         String url = "https://api.paystack.co/transferrecipient";
-        TransferRecipient transferRecipient = restTemplate.exchange(
+        TransferRecipientResponse transferRecipientResponse = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
-                payStackHttpEntity.getEntity(request),
-                TransferRecipient.class
+                payStackHttpEntity.getEntity1(request),
+                TransferRecipientResponse.class
         ).getBody();
-        String reference = request.getBank_code() + util.generateSerialNumber("Tsf") + "Ref";
-        Objects.requireNonNull(transferRecipient).setRecipient_code(reference);
+        String reference = util.generateSerialNumber("Tsf") + "Ref";
 
+        TransferRecipient transferRecipient = Objects.requireNonNull(transferRecipientResponse).getData();
+        transferRecipient.setReference(reference);
         localStorage.save(TRANSFER_RECIPIENT + user.getEmail(), reference, 3600);
+        transferRecipientResponse.setData(transferRecipient);
 
-        return transferRecipient;
+        return transferRecipientResponse;
     }
 
     @Override
-    public TransferResponse setUpTransfer(Principal principal, TransferRequest request) {
-        User user = authDetails.validateActiveUser(principal);
+    public TransferResponse setUpTransfer(Principal principal, TransferRequest request, String reference) {
+        User user = checksBeforeTransaction(principal);
 
-        String reference = request.getRecipient();
         String storedReference = localStorage.getValueByKey(TRANSFER_RECIPIENT + user.getEmail());
 
         if ((reference == null || storedReference == null) || !reference.equals(storedReference)) {
             throw new PaymentException("Transaction session has expired or reference does not exist. " +
                     "Kindly initiate a new transfer");
         }
+        localStorage.clear(TRANSFER_RECIPIENT + user.getEmail());
 
         String url = "https://api.paystack.co/transfer";
         return restTemplate.exchange(
                 url,
                 HttpMethod.POST,
-                payStackHttpEntity.getEntity(request),
+                payStackHttpEntity.getEntity1(request),
                 TransferResponse.class
         ).getBody();
+    }
+
+    @Override
+    public VerifyTransferResponse verifyTransfer(Principal principal, String reference) {
+        checksBeforeTransaction(principal);
+
+        String url = "https://api.paystack.co/transfer/verify/" + reference;
+        VerifyTransferResponse response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                payStackHttpEntity.getEntity1(),
+                VerifyTransferResponse.class
+        ).getBody();
+
+        //SEND A MAIL TO USER THAT TRANSFER WAS SUCCESSFUL
+//        Objects.requireNonNull(response).getAmount()
+        //STORE TRANSACTION
+        return response;
     }
 
     @Override
@@ -187,4 +216,13 @@ public class PaymentServiceImpl implements PaymentService {
                 CustomerValidationResponse.class
         ).getBody();
     }
+
+    private User checksBeforeTransaction(Principal principal) {
+        User user = authDetails.validateActiveUser(principal);
+        Wallet wallet = walletRepository.findByWalletId(user.getWalletId())
+                .orElseThrow(() -> new WalletException("Wallet does not exist."));
+        walletChecker.checksBeforeTransaction(wallet, encoder);
+        return user;
+    }
+
 }

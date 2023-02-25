@@ -9,10 +9,7 @@ import com.example.sikabethwalletapi.model.User;
 import com.example.sikabethwalletapi.model.Wallet;
 import com.example.sikabethwalletapi.pojo.Mapper;
 import com.example.sikabethwalletapi.pojo.paystack.response.CreateCustomerResponse;
-import com.example.sikabethwalletapi.pojo.request.ActivationRequest;
-import com.example.sikabethwalletapi.pojo.request.LoginRequest;
-import com.example.sikabethwalletapi.pojo.request.PasswordResetRequest;
-import com.example.sikabethwalletapi.pojo.request.RegisterRequest;
+import com.example.sikabethwalletapi.pojo.request.*;
 import com.example.sikabethwalletapi.pojo.response.LoginResponse;
 import com.example.sikabethwalletapi.pojo.response.RegisterResponse;
 import com.example.sikabethwalletapi.repository.UserRepository;
@@ -175,6 +172,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String delete(Principal principal) {
+        User user = authDetails.validateActiveUser(principal);
+        userRepository.delete(user);
+        return "User deleted successfully";
+    }
+
+    @Override
     public String forgotPassword(String email) {
         validateEmail(email);
         User user = getUser(email);
@@ -201,6 +205,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public RegisterResponse updateUser(Principal principal, UpdateRequest request) {
+        User user = authDetails.validateActiveUser(principal);
+        User updatedUser = userRepository.save(Mapper.mapUser(user, request));
+        return RegisterResponse.mapFromUser(updatedUser);
+    }
+
+    @Override
     public String logout(Principal principal) {
         User user = authDetails.validateActiveUser(principal);
 
@@ -211,6 +222,14 @@ public class UserServiceImpl implements UserService {
         localStorage.clear(tokenKey);
 
         return "Logout successful";
+    }
+
+    @Override
+    public String updatePassword(Principal principal, String password) {
+        User user = authDetails.validateActiveUser(principal);
+        user.setEncryptedPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        return "Password updated successfully";
     }
 
     @Override
