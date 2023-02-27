@@ -6,9 +6,8 @@ import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -60,6 +59,12 @@ public class User extends Base {
 
     @Column(nullable = false, length = 14)
     private String phoneNumber;
+
+//    @ManyToMany(cascade = {CascadeType.PERSIST}, fetch = FetchType.EAGER)
+//    @JoinTable(name = "users_roles",
+//            joinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "roles_id", referencedColumnName = "id"))
+//    private Collection<Role> roles;
 
     User () {
         super();

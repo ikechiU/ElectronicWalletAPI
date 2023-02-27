@@ -200,7 +200,7 @@ public class WalletServiceImpl implements WalletService {
         BigDecimal fromSikabeth = new BigDecimal(response.getData().getAmount());
         BigDecimal balance = findWallet(user).getBalance().add(fromSikabeth);
 
-        Transaction transaction = createTransaction(user.getUuid(), "Sikabeth transfer to your wallet", "Sikabeth",
+        Transaction transaction = createTransaction(user.getUuid(), "Sikabeth transfer to your wallet.", "Sikabeth",
                 wallet.getWalletId(), fromSikabeth, balance, TransactionType.CREDIT, TransactionSource.BANK);
         transactionRepository.save(transaction);
 

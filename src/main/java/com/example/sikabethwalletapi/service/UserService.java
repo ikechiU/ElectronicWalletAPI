@@ -1,11 +1,13 @@
 package com.example.sikabethwalletapi.service;
 
-import com.example.sikabethwalletapi.pojo.request.*;
-import com.example.sikabethwalletapi.pojo.response.LoginResponse;
-import com.example.sikabethwalletapi.pojo.response.RegisterResponse;
+import com.example.sikabethwalletapi.pojo.user.request.*;
+import com.example.sikabethwalletapi.pojo.user.response.LoginResponse;
+import com.example.sikabethwalletapi.pojo.user.response.RegisterResponse;
+import com.example.sikabethwalletapi.pojo.user.response.UserResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * @author Ikechi Ucheagwu
@@ -15,6 +17,8 @@ import java.security.Principal;
 
 public interface UserService extends UserDetailsService {
     RegisterResponse createUser(RegisterRequest request);
+    UserResponse getUser(Principal principal);
+    List<UserResponse> getUsers(Principal principal, int page, int limit);
     LoginResponse login(LoginRequest request);
     String activateUser(ActivationRequest request);
     String resendActivationToken(String email);

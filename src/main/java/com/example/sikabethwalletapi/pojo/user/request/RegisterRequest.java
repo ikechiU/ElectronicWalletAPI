@@ -1,4 +1,4 @@
-package com.example.sikabethwalletapi.pojo.request;
+package com.example.sikabethwalletapi.pojo.user.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

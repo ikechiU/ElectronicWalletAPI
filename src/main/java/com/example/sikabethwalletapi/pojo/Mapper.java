@@ -3,8 +3,8 @@ package com.example.sikabethwalletapi.pojo;
 import com.example.sikabethwalletapi.enums.Status;
 import com.example.sikabethwalletapi.model.User;
 import com.example.sikabethwalletapi.pojo.paystack.request.CreateCustomerRequest;
-import com.example.sikabethwalletapi.pojo.request.RegisterRequest;
-import com.example.sikabethwalletapi.pojo.request.UpdateRequest;
+import com.example.sikabethwalletapi.pojo.user.request.RegisterRequest;
+import com.example.sikabethwalletapi.pojo.user.request.UpdateRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.Serializable;

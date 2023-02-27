@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class WalletResponse {
     private String uuid;
     private String userUuid;
+    private boolean isAccountActive;
     private String walletId;
     private BigDecimal balance;
     private String bvn;
@@ -34,9 +35,11 @@ public class WalletResponse {
     private VerificationStatus verificationStatus;
 
     public static WalletResponse mapFromWallet(Wallet wallet) {
+        if (wallet == null) return null;
         return WalletResponse.builder()
                 .uuid(wallet.getUuid())
                 .userUuid(wallet.getUserUuid())
+                .isAccountActive(wallet.isAccountActive())
                 .walletId(wallet.getWalletId())
                 .balance(wallet.getBalance())
                 .bvn(wallet.getBvn())
@@ -48,6 +51,7 @@ public class WalletResponse {
     }
 
     public static List<WalletResponse> mapFromWallet(List<Wallet> wallets) {
+        if (wallets == null) return null;
         return wallets.stream()
                 .map(WalletResponse::mapFromWallet)
                 .collect(Collectors.toList());

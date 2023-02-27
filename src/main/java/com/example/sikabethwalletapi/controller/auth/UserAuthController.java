@@ -1,10 +1,10 @@
 package com.example.sikabethwalletapi.controller.auth;
 
 import com.example.sikabethwalletapi.pojo.ApiResponse;
-import com.example.sikabethwalletapi.pojo.request.ActivationRequest;
-import com.example.sikabethwalletapi.pojo.request.LoginRequest;
-import com.example.sikabethwalletapi.pojo.request.PasswordResetRequest;
-import com.example.sikabethwalletapi.pojo.request.RegisterRequest;
+import com.example.sikabethwalletapi.pojo.user.request.ActivationRequest;
+import com.example.sikabethwalletapi.pojo.user.request.LoginRequest;
+import com.example.sikabethwalletapi.pojo.user.request.PasswordResetRequest;
+import com.example.sikabethwalletapi.pojo.user.request.RegisterRequest;
 import com.example.sikabethwalletapi.service.UserService;
 import com.example.sikabethwalletapi.util.ResponseProvider;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;

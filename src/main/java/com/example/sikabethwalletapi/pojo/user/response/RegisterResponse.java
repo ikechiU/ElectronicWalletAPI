@@ -1,4 +1,4 @@
-package com.example.sikabethwalletapi.pojo.response;
+package com.example.sikabethwalletapi.pojo.user.response;
 
 import com.example.sikabethwalletapi.enums.Status;
 import com.example.sikabethwalletapi.model.User;
@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Ikechi Ucheagwu
@@ -44,5 +46,11 @@ public class RegisterResponse {
                 .homeAddress(user.getHomeAddress())
                 .phoneNumber(user.getPhoneNumber())
                 .build();
+    }
+
+    public static List<RegisterResponse> mapFromUser(List<User> userList) {
+        return userList.stream()
+                .map(RegisterResponse::mapFromUser)
+                .collect(Collectors.toList());
     }
 }

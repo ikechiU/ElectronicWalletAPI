@@ -1,4 +1,4 @@
-package com.example.sikabethwalletapi.pojo.request;
+package com.example.sikabethwalletapi.pojo.user.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,9 +17,11 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActivationRequest {
+public class PasswordResetRequest {
     @NotBlank(message = "email must be balance")
     private String email;
-    @NotBlank(message = "token must be balance")
-    private String token;
+    @NotBlank(message = "password must be balance")
+    private String password;
+    @NotBlank(message = "confirmPassword must be balance")
+    private String confirmPassword;
 }

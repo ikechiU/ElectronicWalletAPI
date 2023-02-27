@@ -52,13 +52,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final PasswordEncoder encoder;
 
     @Override
-    public SetUpTransactionResponse initializeTransaction(Principal principal, SetUpTransactionRequest request) {
+    public SetUpTransactionResponse initializeTransaction(Principal principal, SetUpTransactionRequest request) {//PaymentController
         checksBeforeTransaction(principal);
         return initializeTransaction(request);
     }
 
     @Override
-    public SetUpTransactionResponse initializeTransaction(SetUpTransactionRequest request) {
+    public SetUpTransactionResponse initializeTransaction(SetUpTransactionRequest request) {//WalletController
         String url = "https://api.paystack.co/transaction/initialize";
         return restTemplate.exchange(
                 url,
@@ -69,14 +69,14 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public VerifyPaymentResponse verifyTransaction(Principal principal, String reference) {
+    public VerifyPaymentResponse verifyTransaction(Principal principal, String reference) {//PaymentController
         checksBeforeTransaction(principal);
         return verifyTransaction(reference);
         //SEND A MAIL TO USER THAT TRANSFER WAS SUCCESSFUL
     }
 
     @Override
-    public VerifyPaymentResponse verifyTransaction(String reference) {
+    public VerifyPaymentResponse verifyTransaction(String reference) {//WalletController
         String url = "https://api.paystack.co/transaction/verify/" + reference;
         return restTemplate.exchange(
                 url,

@@ -27,6 +27,7 @@ public class Wallet extends Base {
     private String uuid;
 
     private String userUuid;
+    private boolean isAccountActive;
     private String email;
 
     @Indexed(unique = true)

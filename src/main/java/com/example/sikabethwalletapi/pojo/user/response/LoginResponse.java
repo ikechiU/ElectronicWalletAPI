@@ -1,4 +1,4 @@
-package com.example.sikabethwalletapi.pojo.response;
+package com.example.sikabethwalletapi.pojo.user.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

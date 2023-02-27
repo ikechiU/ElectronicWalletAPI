@@ -16,6 +16,5 @@ import java.util.Optional;
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
     Optional<Transaction> findByUuid(String uuid);
     Optional<Transaction> findByFrom(String email);
-    Optional<Transaction> findBySourceAccount(String source_account);
     Optional<Transaction> findByTransactionReference(String transaction_reference);
 }

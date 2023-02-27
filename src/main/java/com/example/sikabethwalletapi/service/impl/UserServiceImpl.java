@@ -9,9 +9,10 @@ import com.example.sikabethwalletapi.model.User;
 import com.example.sikabethwalletapi.model.Wallet;
 import com.example.sikabethwalletapi.pojo.Mapper;
 import com.example.sikabethwalletapi.pojo.paystack.response.CreateCustomerResponse;
-import com.example.sikabethwalletapi.pojo.request.*;
-import com.example.sikabethwalletapi.pojo.response.LoginResponse;
-import com.example.sikabethwalletapi.pojo.response.RegisterResponse;
+import com.example.sikabethwalletapi.pojo.user.request.*;
+import com.example.sikabethwalletapi.pojo.user.response.LoginResponse;
+import com.example.sikabethwalletapi.pojo.user.response.RegisterResponse;
+import com.example.sikabethwalletapi.pojo.user.response.UserResponse;
 import com.example.sikabethwalletapi.repository.UserRepository;
 import com.example.sikabethwalletapi.repository.WalletRepository;
 import com.example.sikabethwalletapi.security.JwtUtils;
@@ -25,6 +26,9 @@ import com.example.sikabethwalletapi.util.LocalStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,9 +39,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -98,6 +104,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUser(Principal principal) {
+        User user = authDetails.validateActiveUser(principal);
+        Wallet wallet = getWallet(user.getWalletId());
+
+        return UserResponse.mapFromData(user, wallet);
+    }
+
+    @Override
+    public List<UserResponse> getUsers(Principal principal, int page, int limit) {
+        authDetails.validateActiveUser(principal);
+
+        if (page > 0) page = page - 1;
+        Pageable pageable = PageRequest.of(page, limit);
+
+        Page<User> pagedUser = userRepository.findAll(pageable);
+        List<User> users = pagedUser.getContent();
+
+        Page<Wallet> pagedWallet = walletRepository.findAll(pageable);
+        List<Wallet> wallets = pagedWallet.getContent();
+
+        return UserResponse.mapFromData(users, wallets);
+    }
+
+    @Override
     public LoginResponse login(LoginRequest request) {
         User user = getUser(request.getEmail());
         if (user.getStatus().name().equals(Status.INACTIVE.name()))
@@ -147,6 +177,7 @@ public class UserServiceImpl implements UserService {
         wallet.setCustomer_code(customer_code);
         wallet.setEmail(user.getEmail());
         wallet.setUserUuid(user.getUuid());
+        wallet.setAccountActive(true);
         walletRepository.save(wallet);
 
         user.setWalletId(wallet.getWalletId());
@@ -246,6 +277,11 @@ public class UserServiceImpl implements UserService {
     private void validateEmail(String email) {
         if (!util.validEmail(email))
             throw new ValidationException("Invalid email address");
+    }
+
+    private Wallet getWallet(String walletId) {
+        return walletRepository.findByWalletId(walletId)
+                .orElse(null);
     }
 
     private Wallet generateWallet() {
