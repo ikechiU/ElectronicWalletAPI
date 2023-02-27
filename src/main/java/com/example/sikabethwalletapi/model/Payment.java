@@ -42,6 +42,9 @@ public class Payment extends Base {
     @Column(nullable = false)
     private String reference;
 
+    @Column(nullable = false)
+    private String accessCode;
+
     public Payment() {
         super();
     }

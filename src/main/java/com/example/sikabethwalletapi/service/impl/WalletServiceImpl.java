@@ -137,6 +137,7 @@ public class WalletServiceImpl implements WalletService {
         CustomerValidationResponse response = paymentService.validateCustomer(request);
         if (response.isStatus() && response.getMessage().equals("Customer Identification in progress")) {
             wallet.setVerificationStatus(VerificationStatus.CONFIRMED);
+            wallet.setBvn(request.getBvn());
             wallet.setVerified(true);
             walletRepository.save(wallet);
         }
@@ -174,7 +175,8 @@ public class WalletServiceImpl implements WalletService {
 
         SikabethWalletResponse result = SikabethWalletResponse.mapFromSetUpTransactionResponse(
                 response.isStatus(), response.getMessage(), user.getEmail(), "Sikabeth",
-                new BigDecimal(request.getAmount()), user.getWalletId(), transfer_code, response.getData().getReference());
+                new BigDecimal(request.getAmount()), user.getWalletId(), transfer_code,
+                response.getData().getReference(), response.getData().getAccess_code());
 
         Payment payment = createPayment(result);
         paymentRepository.save(payment);
@@ -209,7 +211,7 @@ public class WalletServiceImpl implements WalletService {
 
         //SEND USER EMAIL NOTIFICATION
         String message = "<div>Sikabeth transferred " + fromSikabeth +
-                " to your account and your new balance is " + updatedWallet + ".</div>";
+                " to your account and your new balance is " + updatedWallet.getBalance() + ".</div>";
         amazonSES.sendTransaction(message, user.getEmail());
 
         WalletResponse walletResponse = WalletResponse.mapFromWallet(updatedWallet);
@@ -254,6 +256,7 @@ public class WalletServiceImpl implements WalletService {
                 .amount(response.getAmount())
                 .confirmed(false)
                 .reference(response.getReference())
+                .accessCode(response.getAccessCode())
                 .transferCode(response.getTransfer_code())
                 .build();
     }

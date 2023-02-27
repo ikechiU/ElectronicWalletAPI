@@ -27,6 +27,8 @@ public class SikabethWalletResponse {
     private String walletId;
     private String transfer_code;
     private String reference;
+    private String accessCode;
+    private String authorization_url;
     private BigDecimal amount;
 
     public static SikabethWalletResponse mapFromSetUpTransactionResponse(boolean status,
@@ -36,7 +38,8 @@ public class SikabethWalletResponse {
                                                                          BigDecimal amount,
                                                                          String walletId,
                                                                          String transfer_code,
-                                                                         String reference) {
+                                                                         String reference,
+                                                                         String accessCode) {
         return SikabethWalletResponse.builder()
                 .status(status)
                 .message(message)
@@ -45,6 +48,8 @@ public class SikabethWalletResponse {
                 .walletId(walletId)
                 .transfer_code(transfer_code)
                 .reference(reference)
+                .accessCode(accessCode)
+                .authorization_url("https://checkout.paystack.com/" + accessCode)
                 .amount(amount)
                 .build();
     }
