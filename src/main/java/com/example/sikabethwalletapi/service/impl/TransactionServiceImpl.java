@@ -1,5 +1,6 @@
 package com.example.sikabethwalletapi.service.impl;
 
+import com.example.sikabethwalletapi.annotation.Loggable;
 import com.example.sikabethwalletapi.enums.TransactionType;
 import com.example.sikabethwalletapi.exception.WalletException;
 import com.example.sikabethwalletapi.model.Transaction;
@@ -33,6 +34,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AuthDetails authDetails;
 
+    @Loggable
     @Override
     public WalletTransactionResponse fetchTransaction(Principal principal, String id) {
         User user = authDetails.validateActiveUser(principal);
@@ -41,6 +43,7 @@ public class TransactionServiceImpl implements TransactionService {
         return WalletTransactionResponse.mapFromTransaction(transaction);
     }
 
+    @Loggable
     @Override
     public List<WalletTransactionResponse> fetchTransactions(Principal principal, int page, int limit) {
         User user = authDetails.validateActiveUser(principal);
@@ -54,6 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
         return WalletTransactionResponse.mapFromTransaction(transactions);
     }
 
+    @Loggable
     @Override
     public List<WalletTransactionResponse> fetchTransactionsByAdmin(Principal principal, int page, int limit) {
         User user = authDetails.validateActiveUser(principal);
@@ -69,6 +73,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
+    @Loggable
     @Override
     public List<WalletTransactionResponse> fetchTransactions(Principal principal, int page, int limit, String transactionType) {
         User user = authDetails.validateActiveUser(principal);
