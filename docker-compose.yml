@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  server:
+    container_name: appserver
+    image: iykeafrica/sikabeth-wallet-api
+    environment:
+      #Spring environment variable
+      SPRING_DATA_MONGODB_URI: mongodb://sikabeth:sikabeth@mongodb:27017/?authSource=admin&authMechanism=SCRAM-SHA-1
+      SPRING_DATA_MONGODB_DATABASE: sikabeth_db
+      MEMCACHED_SERVICE_HOST: memchached
+      MEMCACHED_SERVICE_PORT: 11211
+      INFO_APP_NAME: Spring Actuator
+      INFO_APP_JAVA_VERSION: 17
+      INFO_APP_TYPE: Spring Boot
+      USER_EMAIL_ACTIVATE: UserEmailActivate
+      USER_PASSWORD_FORGOT: UserPasswordForgot
+      AUTH_USER: AuthUser
+      ACTIVE_AUTH_USER: ActiveAuthUser
+      TRANSFER_RECIPIENT: UserEmailTransferRecipient
+      AWSACCESSKEYID: rtyuiopoiuytui #USE YOUR OWN, THIS HERE IS A PLACEHOLDER
+      AWSSECRETKEY: tretyuioplkjhgfdghjkljhg #USE YOUR OWN, THIS HERE IS A PLACEHOLDER
+      SECRET_KEY: poiuytretyuiopiuytrewrtyuiop #USE YOUR OWN, THIS HERE IS A PLACEHOLDER
+      SECRET_KEY1: zxcvbnmkjtyretyuiopijuhgfdsxcvbnmjkuytretyu #USE YOUR OWN, THIS HERE IS A PLACEHOLDER
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - mongodb
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sikabeth
+      MONGO_INITDB_ROOT_PASSWORD: sikabeth
+      MONGO_INITDB_DATABASE: sikabeth_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_container:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: sikabeth
+      ME_CONFIG_MONGODB_ADMINPASSWORD: sikabeth
+      ME_CONFIG_MONGODB_URL: mongodb://sikabeth:sikabeth@mongodb:27017/
+
+  memchached:
+    container_name: memchached
+    image: memcached
+    restart: always
+    ports:
+      - "11211:11211"
+
+volumes:
+  mongodb_data_container:
+
+networks:
+  default:
