@@ -9,6 +9,8 @@ This is a simple RESTful Web Service with Spring Boot - Demonstrating a wallet a
 * HTTP (POST, GET, PUT, DELETE) methods application in Rest Controller.
 * Spring Security Implementation securing endpoints.
 * Authentication and Authorization during login.
+* Memcached.
+* Logout feature implemented. Only one token is active at a given time. Each logout/login invalidates previous token.
 * Spring AOP with AspectJ for logging Advice to reduce crosscutting concern.
 * Swagger Configuration.
 * Amazon SES application during email verification and password reset request.
