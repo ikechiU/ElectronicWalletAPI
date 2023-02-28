@@ -3,7 +3,7 @@
 
 [![Java Build](https://img.shields.io/badge/Java-SpringBoot-brightgreen)](https://spring.io/projects/spring-boot) [![Spring JPA](https://img.shields.io/badge/Spring-JPA-blue)](https://spring.io/projects/spring-data-jpa) [![MongoDb](https://img.shields.io/badge/MongoDb-Passing-green)](https://www.postgresql.org/) [![Amazon Simple Email Service](https://img.shields.io/badge/Amazon-SES-orange)](https://aws.amazon.com/ses/) [![Swagger](https://img.shields.io/badge/Swagger-passing-green)](https://swagger.io/)  
 
-This is a simple RESTful Web Service with Spring Boot - That inspires life.
+This is a simple RESTful Web Service with Spring Boot - Demonstrating a wallet and a payment gateway.
 
 ## Features
 * HTTP (POST, GET, PUT, DELETE) methods application in Rest Controller.
