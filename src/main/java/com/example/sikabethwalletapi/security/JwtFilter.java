@@ -30,7 +30,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     @Value(value = "${auth.user}")
-    private final String AUTH_USER = "AuthUser:";
+    private final String AUTH_USER = "AuthUser";
 
     private final LocalStorage localStorage;
     private final UserRepository userRepository;

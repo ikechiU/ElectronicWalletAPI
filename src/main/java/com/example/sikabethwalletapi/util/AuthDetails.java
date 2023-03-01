@@ -5,6 +5,7 @@ import com.example.sikabethwalletapi.exception.ValidationException;
 import com.example.sikabethwalletapi.model.User;
 import com.example.sikabethwalletapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthDetails {
@@ -40,6 +42,9 @@ public class AuthDetails {
 
         String activeToken = localStorage.getValueByKey(activeTokenKey);
         String token = localStorage.getValueByKey(tokenKey);
+
+        log.info("ActiveAuthUser: " + activeToken);
+        log.info("AuthUser: " + token);
 
         if (activeToken == null || !activeToken.equals(token))
             throw new ValidationException("Token expired. Kindly, login again.");
