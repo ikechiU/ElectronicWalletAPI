@@ -23,7 +23,7 @@ services:
       SECRET_KEY: poiuytretyuiopiuytrewrtyuiop #USE YOUR OWN, THIS HERE IS A PLACEHOLDER
       SECRET_KEY1: zxcvbnmkjtyretyuiopijuhgfdsxcvbnmjkuytretyu #USE YOUR OWN, THIS HERE IS A PLACEHOLDER
     ports:
-      - "8080:8080"
+      - "8086:8086"
     restart: always
     depends_on:
       - mongodb
