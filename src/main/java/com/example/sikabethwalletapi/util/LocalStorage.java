@@ -25,13 +25,13 @@ public class LocalStorage {
 
     public void saveToken(String key, String value) {
         try {
-            log.info("key is {}", key);
+            log.info("saveToken(): key is {}", key);
             if (keyExist(key) != null) {
-                log.info("key is cleared");
+                log.info("saveToken(): key is cleared");
                 clear(key);
             }
             memcachedClient.set(key, 0, value);
-            log.info("key is set with value {}", value);
+            log.info("saveToken(): key is set with value {}", value);
         } catch (TimeoutException | InterruptedException | MemcachedException e) {
             e.printStackTrace();
         }
@@ -57,7 +57,7 @@ public class LocalStorage {
         try {
             memcachedClient.delete(key);
         } catch (TimeoutException | InterruptedException | MemcachedException e) {
-            log.warn("Key is not available {}", key);
+            log.warn("clear(): key is not available {}", key);
             e.printStackTrace();
         }
     }

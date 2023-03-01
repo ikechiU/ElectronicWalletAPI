@@ -1,5 +1,6 @@
 package com.example.sikabethwalletapi.util;
 
+import com.example.sikabethwalletapi.annotation.TokenLog;
 import com.example.sikabethwalletapi.exception.UserNotFoundException;
 import com.example.sikabethwalletapi.exception.ValidationException;
 import com.example.sikabethwalletapi.model.User;
@@ -24,7 +25,7 @@ public class AuthDetails {
     private final UserRepository userRepository;
     private final LocalStorage localStorage;
 
-    private User getAuthorizedUser(Principal principal) {
+    public User getAuthorizedUser(Principal principal) {
         if (principal != null) {
             final String email = principal.getName();
             return userRepository.findByEmail(email)
@@ -34,6 +35,7 @@ public class AuthDetails {
         }
     }
 
+    @TokenLog
     public User validateActiveUser(Principal principal) {
         User user = getAuthorizedUser(principal);
 
@@ -42,9 +44,6 @@ public class AuthDetails {
 
         String activeToken = localStorage.getValueByKey(activeTokenKey);
         String token = localStorage.getValueByKey(tokenKey);
-
-        log.info("ActiveAuthUser: " + activeToken);
-        log.info("AuthUser: " + token);
 
         if (activeToken == null || !activeToken.equals(token))
             throw new ValidationException("Token expired. Kindly, login again.");
