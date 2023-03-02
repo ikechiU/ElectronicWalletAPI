@@ -14,6 +14,7 @@ This is a simple RESTful Web Service with Spring Boot - Demonstrating a wallet a
 * Spring AOP with AspectJ for logging Advice to reduce crosscutting concern.
 * Swagger Configuration.
 * Amazon SES application during email verification and password reset request.
+* CI/CD with GitHub actions and deployed to DockerHub (registry).
 
 ## Prerequisite
 To build this project, you require:
