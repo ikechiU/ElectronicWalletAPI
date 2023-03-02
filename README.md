@@ -25,7 +25,8 @@ To build this project, you require:
 - Spring 2.7.6
 
 ## Test it out
-Clone
+- Clone or
+- Simply download the docker-compose.yml file and run <b><i> "docker-compose up" </i></b> on your terminal. Ensure to be in the path where the downloaded file is and of course you have to install Docker and Docker Compose.
 
 ## Libraries
 *   [Spring Boot Web](https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web)
